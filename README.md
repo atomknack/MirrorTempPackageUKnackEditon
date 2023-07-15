@@ -3,6 +3,8 @@ This repository is to make UPM package from Mirror, as soon as Mirror will be av
 
 # I DO NOT own MIRROR, I AM NOT DEV of MIRROR
 
+MIRROR is available at: https://github.com/MirrorNetworking/Mirror
+
 DO NOT RELY ON THIS REPOSITORY, IT COULD BE GONE any moment, aaanyy moment now ...
 
 UPM path:
