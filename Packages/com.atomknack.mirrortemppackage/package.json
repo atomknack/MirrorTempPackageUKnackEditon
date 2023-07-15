@@ -1,0 +1,17 @@
+{
+  "name": "com.atomknack.mirrortemppackage",
+  "version": "79.1.4",
+  "displayName": "Mirror temporary package",
+  "description": "Mirror Networking repackaged (temporary) as UPM by Atomknack",
+  "unity": "2022.2",
+  "unityRelease": "0b8",
+  "documentationUrl": "https://github.com/MirrorNetworking/Mirror",
+  "licensesUrl": "https://github.com/MirrorNetworking/Mirror/blob/master/LICENSE",
+  "license": "MIT",
+  "author": {
+    "name": "atomknack",
+    "email": "atomknack@gmail.com",
+    "url": "atomknack.com"
+  },
+  "scopedRegistries": []
+}
