@@ -1,10 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Text;
 using UnityEngine;
 
 namespace Mirror
 {
-
     // for performance, we (ab)use c# generics to cache the message id in a static field
     // this is significantly faster than doing the computation at runtime or looking up cached results via Dictionary
     // generic classes have separate static fields per type specification
@@ -16,7 +17,8 @@ namespace Mirror
         // => addons can work with each other without knowing their ids before
         // => 2 bytes is enough to avoid collisions.
         //    registering a messageId twice will log a warning anyway.
-        public static readonly ushort Id = (ushort)(typeof(T).FullName.GetStableHashCode());
+        public static readonly ushort Id =
+            (ushort)(typeof(T).FullName.GetStableHashCode());
     }
 
     // message packing all in one place, instead of constructing headers in all
@@ -28,6 +30,23 @@ namespace Mirror
     {
         // size of message id header in bytes
         public const int IdSize = sizeof(ushort);
+
+        // Id <> Type lookup for debugging, profiler, etc.
+        // important when debugging messageId errors!
+        public static readonly Dictionary<ushort, Type> Lookup =
+            new Dictionary<ushort, Type>();
+
+        // dump all types for debugging
+        public static void LogTypes()
+        {
+            StringBuilder builder = new StringBuilder();
+            builder.AppendLine("NetworkMessageIds:");
+            foreach (KeyValuePair<ushort, Type> kvp in Lookup)
+            {
+                builder.AppendLine($"  Id={kvp.Key} = {kvp.Value}");
+            }
+            Debug.Log(builder.ToString());
+        }
 
         // max message content size (without header) calculation for convenience
         // -> Transport.GetMaxPacketSize is the raw maximum
@@ -47,9 +66,8 @@ namespace Mirror
         // => addons can work with each other without knowing their ids before
         // => 2 bytes is enough to avoid collisions.
         //    registering a messageId twice will log a warning anyway.
-        // Deprecated 2023-02-15
+        // keep this for convenience. easier to use than NetworkMessageId<T>.Id.
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [Obsolete("Use NetworkMessageId<T>.Id instead")]
         public static ushort GetId<T>() where T : struct, NetworkMessage =>
             NetworkMessageId<T>.Id;
 
