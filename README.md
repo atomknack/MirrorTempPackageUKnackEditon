@@ -7,5 +7,5 @@ MIRROR is available at: https://github.com/MirrorNetworking/Mirror
 
 DO NOT RELY ON THIS REPOSITORY, IT COULD BE GONE any moment, aaanyy moment now ...
 
-UPM path:
+UPM path of this package:
 https://github.com/atomknack/MirrorTempPackageUKnackEditon.git?path=/Packages/com.atomknack.mirrortemppackage
