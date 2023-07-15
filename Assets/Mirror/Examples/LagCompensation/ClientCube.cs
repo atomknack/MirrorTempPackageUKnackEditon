@@ -1,8 +1,9 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Mirror.Examples.SnapshotInterpolationDemo
+namespace Mirror.Examples.LagCompensationDemo
 {
     public class ClientCube : MonoBehaviour
     {
@@ -27,7 +28,7 @@ namespace Mirror.Examples.SnapshotInterpolationDemo
         // for smooth interpolation, we need to interpolate along server time.
         // any other time (arrival on client, client local time, etc.) is not
         // going to give smooth results.
-        double localTimeline;
+        internal double localTimeline;
 
         // catchup / slowdown adjustments are applied to timescale,
         // to be adjusted in every update instead of when receiving messages.
@@ -42,9 +43,9 @@ namespace Mirror.Examples.SnapshotInterpolationDemo
 
         // debugging ///////////////////////////////////////////////////////////
         [Header("Debug")]
-        public Color catchupColor = Color.green; // green traffic light = go fast
-        public Color slowdownColor = Color.red;  // red traffic light = go slow
-        Color defaultColor;
+        public Color hitColor      = Color.blue;
+        public Color missedColor   = Color.magenta;
+        public Color originalColor = Color.black;
 
         [Header("Simulation")]
         bool lowFpsMode;
@@ -52,11 +53,7 @@ namespace Mirror.Examples.SnapshotInterpolationDemo
 
         void Awake()
         {
-            // show vsync reminder. too easy to forget.
-            Debug.Log("Reminder: Snapshot interpolation is smoothest & easiest to debug with Vsync off.");
-
-
-            defaultColor = render.sharedMaterial.color;
+            // defaultColor = render.sharedMaterial.color;
 
             // initialize EMA with 'emaDuration' seconds worth of history.
             // 1 second holds 'sendRate' worth of values.
@@ -146,14 +143,35 @@ namespace Mirror.Examples.SnapshotInterpolationDemo
 
             // reset simulation helpers
             accumulatedDeltaTime = 0;
+        }
 
-            // color material while catching up / slowing down
-            if (localTimescale < 1)
-                render.material.color = slowdownColor;
-            else if (localTimescale > 1)
-                render.material.color = catchupColor;
+        void OnMouseDown()
+        {
+            // send the command.
+            // only x coordinate matters for this simple example.
+            if (server.CmdClicked(transform.position))
+            {
+                Debug.Log($"Click hit!");
+                FlashColor(hitColor);
+            }
             else
-                render.material.color = defaultColor;
+            {
+                Debug.Log($"Click missed!");
+                FlashColor(missedColor);
+            }
+        }
+
+        // simple visual indicator for better feedback.
+        // changes the cube's color for a short time.
+        void FlashColor(Color color) =>
+            StartCoroutine(TemporarilyChangeColorToGreen(color));
+
+        IEnumerator TemporarilyChangeColorToGreen(Color color)
+        {
+            Renderer r = GetComponentInChildren<Renderer>();
+            r.material.color = color;
+            yield return new WaitForSeconds(0.2f);
+            r.material.color = originalColor;
         }
 
         void OnGUI()
@@ -167,8 +185,9 @@ namespace Mirror.Examples.SnapshotInterpolationDemo
             GUI.Label(new Rect(screen.x - width / 2, screen.y - height / 2, width, height), str);
 
             // client simulation buttons on the bottom of the screen
-            float areaHeight = 100;
+            float areaHeight = 150;
             GUILayout.BeginArea(new Rect(0, Screen.height - areaHeight, Screen.width, areaHeight));
+            GUILayout.Label("Click the black cube. Lag compensation will correct the latency.");
             GUILayout.BeginHorizontal();
             GUILayout.Label("Client Simulation:");
             if (GUILayout.Button((lowFpsMode ? "Disable" : "Enable") + " 1 FPS"))
