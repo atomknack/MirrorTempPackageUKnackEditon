@@ -1,8 +1,8 @@
 {
   "name": "com.atomknack.mirrortemppackage",
-  "version": "81.0.0",
+  "version": "81.0.1",
   "displayName": "Mirror temporary package",
-  "description": "Mirror Networking repackaged (temporary) as UPM by Atomknack",
+  "description": "with #3551, Mirror Networking repackaged (temporary) as UPM by Atomknack",
   "unity": "2022.3",
   "unityRelease": "0f1",
   "documentationUrl": "https://github.com/MirrorNetworking/Mirror",
