@@ -303,22 +303,23 @@ namespace Mirror
 
             // GetComponentInParent(includeInactive) is needed because Prefabs are not
             // considered active, so this check requires to scan inactive.
-#if UNITY_EDITOR
-#if UNITY_2021_3_OR_NEWER // 2021 has GetComponentInParents(active)
-            if (GetComponent<NetworkIdentity>() == null &&
-                GetComponentInParent<NetworkIdentity>(true) == null)
-            {
-                Debug.LogError($"{GetType()} on {name} requires a NetworkIdentity. Please add a NetworkIdentity component to {name} or it's parents.");
-            }
-#elif UNITY_2020_3_OR_NEWER // 2020 only has GetComponentsInParents(active), we can use this too
-            NetworkIdentity[] parentsIds = GetComponentsInParent<NetworkIdentity>(true);
-            int parentIdsCount = parentsIds != null ? parentsIds.Length : 0;
-            if (GetComponent<NetworkIdentity>() == null && parentIdsCount == 0)
-            {
-                Debug.LogError($"{GetType()} on {name} requires a NetworkIdentity. Please add a NetworkIdentity component to {name} or it's parents.");
-            }
-#endif
-#endif
+// commented as fix for Mirror #3553 issue
+// #if UNITY_EDITOR
+// #if UNITY_2021_3_OR_NEWER // 2021 has GetComponentInParents(active)
+//            if (GetComponent<NetworkIdentity>() == null &&
+//                GetComponentInParent<NetworkIdentity>(true) == null)
+//            {
+//                Debug.LogError($"{GetType()} on {name} requires a NetworkIdentity. Please add a NetworkIdentity component to {name} or it's parents.");
+//            }
+//#elif UNITY_2020_3_OR_NEWER // 2020 only has GetComponentsInParents(active), we can use this too
+//            NetworkIdentity[] parentsIds = GetComponentsInParent<NetworkIdentity>(true);
+//            int parentIdsCount = parentsIds != null ? parentsIds.Length : 0;
+//            if (GetComponent<NetworkIdentity>() == null && parentIdsCount == 0)
+//            {
+//                Debug.LogError($"{GetType()} on {name} requires a NetworkIdentity. Please add a NetworkIdentity component to {name} or it's parents.");
+//            }
+//#endif
+//#endif
         }
 
         // pass full function name to avoid ClassA.Func <-> ClassB.Func collisions
