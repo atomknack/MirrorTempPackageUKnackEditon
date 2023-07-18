@@ -14,7 +14,7 @@ namespace Mirror
 
         /// <summary>Server Update frequency, per second. Use around 60Hz for fast paced games like Counter-Strike to minimize latency. Use around 30Hz for games like WoW to minimize computations. Use around 1-10Hz for slow paced games like EVE.</summary>
         // overwritten by NetworkManager (if any)
-        public static int tickRate = 30;
+        public static int tickRate = 60;
 
         // tick rate is in Hz.
         // convert to interval in seconds for convenience where needed.
@@ -266,6 +266,7 @@ namespace Mirror
             RegisterHandler<ReadyMessage>(OnClientReadyMessage);
             RegisterHandler<CommandMessage>(OnCommandMessage);
             RegisterHandler<NetworkPingMessage>(NetworkTime.OnServerPing, false);
+            RegisterHandler<NetworkPongMessage>(NetworkTime.OnServerPong, false);
             RegisterHandler<EntityStateMessage>(OnEntityStateMessage, true);
             RegisterHandler<TimeSnapshotMessage>(OnTimeSnapshotMessage, true);
         }
@@ -840,16 +841,12 @@ namespace Mirror
 
         internal static bool GetNetworkIdentity(GameObject go, out NetworkIdentity identity)
         {
-            identity = go.GetComponent<NetworkIdentity>();
-            if (identity != null)
-                return true;
-
-            identity = go.GetComponentInParent<NetworkIdentity>(true);
-            if (identity != null)
-                return true;
-
-            Debug.LogError($"GameObject {go.name} doesn't have NetworkIdentity.");
-            return false;
+            if (!go.TryGetComponent(out identity))
+            {
+                Debug.LogError($"GameObject {go.name} doesn't have NetworkIdentity.");
+                return false;
+            }
+            return true;
         }
 
         // disconnect //////////////////////////////////////////////////////////

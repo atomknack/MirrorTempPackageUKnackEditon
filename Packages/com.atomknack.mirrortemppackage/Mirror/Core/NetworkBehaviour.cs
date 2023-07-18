@@ -301,11 +301,23 @@ namespace Mirror
             // parents.
             // only run this in Editor. don't add more runtime overhead.
 
+            // GetComponentInParent(includeInactive) is needed because Prefabs are not
+            // considered active, so this check requires to scan inactive.
 #if UNITY_EDITOR
-            if(!NetworkServer.GetNetworkIdentity(gameObject, out _))
+#if UNITY_2021_3_OR_NEWER // 2021 has GetComponentInParents(active)
+            if (GetComponent<NetworkIdentity>() == null &&
+                GetComponentInParent<NetworkIdentity>(true) == null)
             {
                 Debug.LogError($"{GetType()} on {name} requires a NetworkIdentity. Please add a NetworkIdentity component to {name} or it's parents.");
             }
+#elif UNITY_2020_3_OR_NEWER // 2020 only has GetComponentsInParents(active), we can use this too
+            NetworkIdentity[] parentsIds = GetComponentsInParent<NetworkIdentity>(true);
+            int parentIdsCount = parentsIds != null ? parentsIds.Length : 0;
+            if (GetComponent<NetworkIdentity>() == null && parentIdsCount == 0)
+            {
+                Debug.LogError($"{GetType()} on {name} requires a NetworkIdentity. Please add a NetworkIdentity component to {name} or it's parents.");
+            }
+#endif
 #endif
         }
 
@@ -743,7 +755,6 @@ namespace Mirror
         //          GeneratedSyncVarDeserialize(reader, ref health, null, reader.ReadInt());
         //      }
         //  }
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void GeneratedSyncVarDeserialize<T>(ref T field, Action<T, T> OnChanged, T value)
         {
             T previous = field;
@@ -801,7 +812,6 @@ namespace Mirror
         //           GeneratedSyncVarDeserialize_GameObject(reader, ref target, OnChangedNB, ref ___targetNetId);
         //       }
         //   }
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void GeneratedSyncVarDeserialize_GameObject(ref GameObject field, Action<GameObject, GameObject> OnChanged, NetworkReader reader, ref uint netIdField)
         {
             uint previousNetId = netIdField;
@@ -864,7 +874,6 @@ namespace Mirror
         //           GeneratedSyncVarDeserialize_NetworkIdentity(reader, ref target, OnChangedNI, ref ___targetNetId);
         //       }
         //   }
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void GeneratedSyncVarDeserialize_NetworkIdentity(ref NetworkIdentity field, Action<NetworkIdentity, NetworkIdentity> OnChanged, NetworkReader reader, ref uint netIdField)
         {
             uint previousNetId = netIdField;
@@ -928,7 +937,6 @@ namespace Mirror
         //           GeneratedSyncVarDeserialize_NetworkBehaviour(reader, ref target, OnChangedNB, ref ___targetNetId);
         //       }
         //   }
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void GeneratedSyncVarDeserialize_NetworkBehaviour<T>(ref T field, Action<T, T> OnChanged, NetworkReader reader, ref NetworkBehaviourSyncVar netIdField)
             where T : NetworkBehaviour
         {
@@ -1094,7 +1102,6 @@ namespace Mirror
             DeserializeSyncVars(reader, initialState);
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         void SerializeSyncObjects(NetworkWriter writer, bool initialState)
         {
             // if initialState: write all SyncVars.
@@ -1105,7 +1112,6 @@ namespace Mirror
                 SerializeObjectsDelta(writer);
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         void DeserializeSyncObjects(NetworkReader reader, bool initialState)
         {
             if (initialState)
