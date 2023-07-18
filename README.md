@@ -9,3 +9,5 @@ DO NOT RELY ON THIS REPOSITORY, IT COULD BE GONE any moment, aaanyy moment now .
 
 UPM path of this package:
 https://github.com/atomknack/MirrorTempPackageUKnackEditon.git?path=/Packages/com.atomknack.mirrortemppackage
+
+this package has NetworkBehaviour validation parent search of NetworkIdentity disabled as temporary fix for #3553
